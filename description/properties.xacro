@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <!-- xacro:include filename="example_include.xacro" /-->
+  <xacro:property name="dome_radius" value="0.231775"/>
+  <xacro:property name="body_radius" value="0.2308098" />
+  <xacro:property name="body_diameter" value="${radius * 2}" />
+  <xacro:property name="body_height" value="0.49149" />
+
+  <xacro:property name="body_shoulder_offset" value="0.098425" />
+
+  <xacro:property name="body_z_offset" value="${(-body_height / 2) + 0.098425}" />
+  <xacro:property name="center_leg_offset_from_shoulder" value="0.37510" />
+  <xacro:property name="center_leg_ankle_offset" value="0.18786" />
+
+  <!-- wheel circumference is 37.5cm, diameter is 11.937cm, radius is 5.9685cm  -->
+  <!-- vex wheel diameter is 101.60mm (10.16cm), diameter is 31.92cm -->
+
+  <xacro:property name="outer_ankle_joint_z" value="0.13653" />
+  <xacro:property name="center_ankle_joint_z" value="0.12383" />
+  <xacro:property name="wheel_radius" value="0.059685" /><!-- 5cm radius -->
+  <xacro:property name="wheel_thickness" value="0.05" /> <!-- 5cm -->
+  <xacro:property name="wheel_separation" value="${(body_radius + 0.0127 + 0.0425) * 2}" />
+
+  <xacro:property name="front_wheel_offset" value="0.092075" />
+  <xacro:property name="rear_wheel_offset" value="0.092075" />
+  <xacro:property name="foot_distance_from_ground" value="0.0254" />
+  
+  <xacro:property name="dome_offset" value="${body_shoulder_offset + 0.0254}" />
+
+  <!-- shell, hoses, batery box, etc-->
+  <xacro:property name="foot_length" value="0.3556"/>
+  <xacro:property name="foot_width" value="0.18034"/>
+  <xacro:property name="foot_height" value="0.155575"/>
+  <xacro:property name="foot_width_offset" value="0.0175" />
+  <xacro:property name="foot_mass" value="${1.267 + 0.526 + 0.265 + 0.851}"/>
+
+  <!-- leg & ankle -->
+  <xacro:property name="leg_mass" value="1"/><!-- TODO: Update Me -->
+  <xacro:property name="leg_width" value="0.111125"/>
+  <xacro:property name="leg_depth" value="0.0635"/>
+  <xacro:property name="leg_length" value="0.5496052"/>
+
+  <!-- Center Leg -->
+  <xacro:property name="center_leg_mass" value="1" />
+  <xacro:property name="center_leg_width" value="0.127" />
+  <xacro:property name="center_leg_depth" value="0.123825" />
+  <xacro:property name="center_leg_length" value="0.1878784" />
+
+  <!-- Center Foot -->
+  <xacro:property name="center_foot_mass" value="1" />
+  <xacro:property name="center_foot_width" value="0.18034" />
+  <xacro:property name="center_foot_depth" value="0.263525" />
+  <xacro:property name="center_foot_height" value="0.1412748" />
+
+
+</robot>

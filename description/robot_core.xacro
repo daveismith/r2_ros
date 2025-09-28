@@ -2,23 +2,10 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" >
 
     <xacro:include filename="inertial_macros.xacro"/>
+    <xacro:include filename="properties.xacro" />
 
-
-    <xacro:property name="chassis_length" value="0.335"/>
-    <xacro:property name="chassis_width" value="0.265"/>
-    <xacro:property name="chassis_height" value="0.138"/>
-    <xacro:property name="chassis_mass" value="1.0"/>
-    <xacro:property name="wheel_radius" value="0.033"/>
-    <xacro:property name="wheel_thickness" value="0.026"/>
     <xacro:property name="wheel_mass" value="0.05"/>
-    <xacro:property name="wheel_offset_x" value="0.226"/>
-    <xacro:property name="wheel_offset_y" value="0.1485"/>
-    <xacro:property name="wheel_offset_z" value="0.01"/>
-    <xacro:property name="caster_wheel_radius" value="0.01"/>
-    <xacro:property name="caster_wheel_mass" value="0.01"/>
-    <xacro:property name="caster_wheel_offset_x" value="0.075"/>
-    <xacro:property name="caster_wheel_offset_z" value="${wheel_offset_z - wheel_radius + caster_wheel_radius}"/>
-
+    
     <material name="white">
         <color rgba="1 1 1 1" />
     </material>
@@ -56,44 +43,12 @@
     <link name="base_footprint">
     </link>
 
-
-    <!-- CHASSIS LINK -->
-
-    <joint name="chassis_joint" type="fixed">
-        <parent link="base_link"/>
-        <child link="chassis"/>
-        <origin xyz="${-wheel_offset_x} 0 ${-wheel_offset_z}"/>
-    </joint>
-
-    <link name="chassis">
-        <visual>
-            <origin xyz="${chassis_length/2} 0 ${chassis_height/2}"/>
-            <geometry>
-                <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
-            </geometry>
-            <material name="orange"/>
-        </visual>
-        <collision>
-            <origin xyz="${chassis_length/2} 0 ${chassis_height/2}"/>
-            <geometry>
-                <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
-            </geometry>
-        </collision>
-        <xacro:inertial_box mass="0.5" x="${chassis_length}" y="${chassis_width}" z="${chassis_height}">
-            <origin xyz="${chassis_length/2} 0 ${chassis_height/2}" rpy="0 0 0"/>
-        </xacro:inertial_box>
-    </link>
-
-    <gazebo reference="chassis">
-        <material>Gazebo/Orange</material>
-    </gazebo>
-
     <!-- LEFT WHEEL LINK -->
 
     <joint name="left_wheel_joint" type="continuous">
         <parent link="base_link"/>
         <child link="left_wheel"/>
-        <origin xyz="0 ${wheel_offset_y} 0" rpy="-${pi/2} 0 0" />
+        <origin xyz="${-rear_wheel_offset} ${wheel_separation / 2} ${wheel_radius}" rpy="-${pi/2} 0 0" />
         <axis xyz="0 0 1"/>
     </joint>
 
@@ -106,7 +61,7 @@
         </visual>
         <collision>
             <geometry>
-                <sphere radius="${wheel_radius}"/>
+                <cylinder radius="${wheel_radius}" length="${wheel_thickness}"/>
             </geometry>
         </collision>
         <xacro:inertial_cylinder mass="${wheel_mass}" length="${wheel_thickness}" radius="${wheel_radius}">
@@ -118,15 +73,43 @@
         <material>Gazebo/Blue</material>
     </gazebo>
 
+    <!-- LEFT IDLER -->
+    <joint name="left_idler_joint" type="continuous">
+        <parent link="base_link"/>
+        <child link="left_idler"/>
+        <origin xyz="${front_wheel_offset} ${wheel_separation / 2} ${wheel_radius}" rpy="${pi/2} 0 0" />
+        <axis xyz="0 0 -1"/>
+    </joint>
 
+    <link name="left_idler">
+        <visual>
+            <geometry>
+                <cylinder radius="${wheel_radius}" length="${wheel_thickness}"/>
+            </geometry>
+            <material name="blue"/>
+        </visual>
+        <collision>
+            <geometry>
+                <cylinder radius="${wheel_radius}" length="${wheel_thickness}"/>
+            </geometry>
+        </collision>
+        <xacro:inertial_cylinder mass="${wheel_mass}" length="${wheel_thickness}" radius="${wheel_radius}">
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+        </xacro:inertial_cylinder>
+    </link>
 
+    <gazebo reference="left_idler">
+        <material>Gazebo/Blue</material>
+        <mu1>0</mu1>
+        <mu2>0</mu2>
+    </gazebo>
 
     <!-- RIGHT WHEEL LINK -->
 
     <joint name="right_wheel_joint" type="continuous">
         <parent link="base_link"/>
         <child link="right_wheel"/>
-        <origin xyz="0 ${-wheel_offset_y} 0" rpy="${pi/2} 0 0" />
+        <origin xyz="${-rear_wheel_offset} ${-wheel_separation / 2} ${wheel_radius}" rpy="${pi/2} 0 0" />
         <axis xyz="0 0 -1"/>
     </joint>
 
@@ -139,7 +122,7 @@
         </visual>
         <collision>
             <geometry>
-                <sphere radius="${wheel_radius}"/>
+                <cylinder radius="${wheel_radius}" length="${wheel_thickness}"/>
             </geometry>
         </collision>
         <xacro:inertial_cylinder mass="${wheel_mass}" length="${wheel_thickness}" radius="${wheel_radius}">
@@ -151,37 +134,295 @@
         <material>Gazebo/Blue</material>
     </gazebo>
 
-
-    <!-- CASTER WHEEL LINK -->
-
-    <joint name="caster_wheel_joint" type="fixed">
-        <parent link="chassis"/>
-        <child link="caster_wheel"/>
-        <origin xyz="${caster_wheel_offset_x} 0 ${caster_wheel_offset_z}"/>
+    <!-- RIGHT IDLER -->
+    <joint name="right_idler_joint" type="continuous">
+        <parent link="base_link"/>
+        <child link="right_idler"/>
+        <origin xyz="${front_wheel_offset} ${-wheel_separation / 2} ${wheel_radius}" rpy="${pi/2} 0 0" />
+        <axis xyz="0 0 -1"/>
     </joint>
 
-
-    <link name="caster_wheel">
+    <link name="right_idler">
         <visual>
             <geometry>
-                <sphere radius="${caster_wheel_radius}"/>
+                <cylinder radius="${wheel_radius}" length="${wheel_thickness}"/>
             </geometry>
-            <material name="white"/>
+            <material name="blue"/>
         </visual>
         <collision>
             <geometry>
-                <sphere radius="${caster_wheel_radius}"/>
+                <cylinder radius="${wheel_radius}" length="${wheel_thickness}"/>
             </geometry>
         </collision>
-        <xacro:inertial_sphere mass="${caster_wheel_mass}" radius="${caster_wheel_radius}">
+        <xacro:inertial_cylinder mass="${wheel_mass}" length="${wheel_thickness}" radius="${wheel_radius}">
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+        </xacro:inertial_cylinder>
+    </link>
+
+    <gazebo reference="right_idler">
+        <material>Gazebo/Blue</material>
+        <mu1>0</mu1>
+        <mu2>0</mu2>
+    </gazebo>
+
+    <!-- RIGHT FOOT LINK -->
+    <joint name="right_foot_joint" type="fixed">
+        <parent link="base_link"/>
+        <child link="right_foot"/>
+        <origin xyz="0 ${-wheel_separation / 2} ${foot_distance_from_ground}"/>
+    </joint>
+
+    <link name="right_foot">
+        <visual>
+            <origin xyz="0 0 0" rpy="${radians(90)} 0 0"/>
+            <geometry>
+                <mesh filename="package://r2_ros/meshes/right_foot.stl" scale="0.001 0.001 0.001"/>
+            </geometry>
+            <material name="white" />
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="${radians(90)} 0 0"/>
+            <geometry>
+                <mesh filename="package://r2_ros/meshes/right_foot.stl" scale="0.001 0.001 0.001"/>
+            </geometry>
+        </collision>
+
+        <xacro:inertial_box mass="${foot_mass}" x="${foot_length}" y="${foot_width}" z="${foot_height}">
+            <origin xyz="0 ${foot_width_offset} ${foot_height/2}" rpy="0 0 0"/>
+        </xacro:inertial_box>
+    </link>
+
+    <!-- RIGHT ANGLE JOINT -->
+    <joint name="right_ankle_joint" type="revolute">
+        <origin xyz="0 0.0425 ${outer_ankle_joint_z}" rpy="0 0 0" />
+        <parent link="right_foot" />
+        <child link="right_leg" />
+        <axis xyz="0 -1 0" />
+        <limit lower="-${radians(18)}" upper="${radians(2)}" velocity="100" effort="100" />
+    </joint>
+
+    <link name="right_leg">
+        <visual>
+            <origin xyz="0 0 0.5496052" rpy="${radians(180)} 0 0" />
+            <geometry>
+                <mesh filename="package://r2_ros/meshes/right_leg.obj" scale="1 1 1" />
+            </geometry>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0.5496052" rpy="${radians(180)} 0 0" />
+            <geometry>
+                <mesh filename="package://r2_ros/meshes/right_leg.obj" scale="1 1 1" />
+            </geometry>
+        </collision>
+        <xacro:inertial_box mass="${leg_mass}" x="${leg_width}" y="${leg_depth}" z="${leg_length}">
+            <origin xyz="0 -0.02215 ${leg_length/2}" rpy="0 0 0"/>
+        </xacro:inertial_box>
+    </link>
+
+    <!-- RIGHT SHOULDER AND BODY -->
+    <!--
+        shoulder is down 3.875" from body top (98.425 mm)
+        shoulder to ankle is 21.638 in" (549.6052 mm)
+        ${0.5496052 - 0.245745 + 0.098425}
+    -->
+    <joint name="right_shoulder_joint" type="revolute">
+        <origin xyz="0 ${body_radius + 0.0127} ${0.5496052}" rpy="0 0 0" />
+        <parent link="right_leg" />
+        <child link="body" />
+        <axis xyz="0 -1 0" />
+        <limit lower="-${radians(4)}" upper="${radians(36)}" velocity="100" effort="100" />
+    </joint>
+
+    <xacro:property name="body_mass" value="1"/>
+
+    <link name="body">
+        <visual>
+            <origin xyz="0 0 ${body_shoulder_offset}" rpy="${radians(90)} 0 ${radians(90)}" />
+            <geometry>
+                <!--<cylinder length="${body_height}" radius="${body_radius}" /> -->
+                <!-- Exported in meters -->
+                <mesh filename="package://r2_ros/meshes/frame.obj" scale="1 1 1" />
+            </geometry>
+        </visual>
+
+        <collision>
+            <origin xyz="0 0 ${body_shoulder_offset}" rpy="${radians(90)} 0 ${radians(90)}" />
+            <geometry>
+                <mesh filename="package://r2_ros/meshes/frame.obj" scale="1 1 1" />
+            </geometry>
+        </collision>
+
+        <xacro:inertial_cylinder mass="${body_mass}" length="${body_height}" radius="${body_radius}">
+            <origin xyz="0 0 ${body_shoulder_offset - (body_height/2)}" rpy="0 0 0"/>
+        </xacro:inertial_cylinder>
+    </link>
+
+    <!-- LEFT SHOULDER & LEG -->
+    <joint name="left_shoulder_joint" type="revolute">
+        <origin xyz="0 ${body_radius + 0.0127} 0" rpy="0 0 ${radians(180)}" />
+        <parent link="body" />
+        <child link="left_leg" />
+        <axis xyz="0 -1 0" />
+        <limit lower="-${radians(4)}" upper="${radians(36)}" velocity="100" effort="100" />
+        <mimic joint="right_shoulder_joint" multiplier="1" offset="0" />
+    </joint>
+
+    <link name="left_leg">
+        <visual>
+            <origin xyz="0 0 0" rpy="${radians(180)} 0 0" />
+            <geometry>
+                <mesh filename="package://r2_ros/meshes/left_leg.obj" scale="1 1 1" />
+            </geometry>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="${radians(180)} 0 0" />
+            <geometry>
+                <mesh filename="package://r2_ros/meshes/left_leg.obj" scale="1 1 1" />
+            </geometry>
+        </collision>
+        <xacro:inertial_box mass="${leg_mass}" x="${leg_width}" y="${leg_depth}" z="${leg_length}">
+            <origin xyz="0 -0.02215 ${-leg_length / 2}" rpy="0 0 0"/>
+        </xacro:inertial_box>
+    </link>
+
+    <!-- LEFT ANKLE & FOOT -->    
+    <joint name="left_ankle_joint" type="revolute">
+        <origin xyz="0 -0.0425 -${0.5496052}" rpy="0 0 0" />
+        <parent link="left_leg" />
+        <child link="left_foot" />
+        <axis xyz="0 -1 0" />
+        <limit lower="-${radians(18)}" upper="${radians(2)}" velocity="100" effort="100" />
+        <mimic joint="right_ankle_joint" multiplier="1" offset="0" />
+    </joint>
+
+    <link name="left_foot">
+        <visual>
+            <origin xyz="0 0 ${-outer_ankle_joint_z}" rpy="${radians(90)} 0 ${radians(180)}" />
+            <geometry>
+                <mesh filename="package://r2_ros/meshes/left_foot.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+            <material name="white" />
+        </visual>
+        <collision>
+            <origin xyz="0 0 ${-outer_ankle_joint_z}" rpy="${radians(90)} 0 ${radians(180)}" />
+            <geometry>
+                <mesh filename="package://r2_ros/meshes/left_foot.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+        <xacro:inertial_box mass="${foot_mass}" x="${foot_length}" y="${foot_width}" z="${foot_height}">
+            <origin xyz="0 ${foot_width_offset} ${0.01725-(foot_height/2)}" rpy="0 0 0"/>
+        </xacro:inertial_box>
+    </link>
+
+    <!-- CENTER LEG -->
+    <joint name="center_leg_joint" type="fixed">
+        <parent link="body" />
+        <child link="center_leg" />
+        <origin xyz="0 0 -${center_leg_offset_from_shoulder}" />
+    </joint>
+
+    <link name="center_leg">
+        <visual>
+            <origin xyz="0 0 0" rpy="${radians(90)} 0 ${radians(90)}" />
+            <geometry>
+                <mesh filename="package://r2_ros/meshes/center_leg.stl" />
+            </geometry>
+            <material name="white" />
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="${radians(90)} 0 ${radians(90)}" />
+            <geometry>
+                <mesh filename="package://r2_ros/meshes/center_leg.stl" />
+            </geometry>
+        </collision>
+
+        <xacro:inertial_box mass="${center_leg_mass}" x="${center_leg_width}" y="${center_leg_depth}" z="${center_leg_length}">
+            <origin xyz="0 0 -${center_leg_length/2}" rpy="0 0 0"/>
+        </xacro:inertial_box>
+    </link>
+
+    <!-- CENTER FOOT -->
+    <joint name="center_foot_joint" type="revolute">
+        <parent link="center_leg" />
+        <child link="center_foot" />
+        <origin xyz="0 0 -${center_leg_ankle_offset}" />
+        <axis xyz="0 -1 0" />
+        <limit lower="-${radians(18)}" upper="${radians(2)}" velocity="100" effort="100" />
+        <mimic joint="right_ankle_joint" multiplier="1" offset="0" />
+    </joint>
+
+    <link name="center_foot">
+        <visual>
+            <origin xyz="0 0 -${center_ankle_joint_z}" rpy="${radians(90)} 0 ${radians(90)}" />
+            <geometry>
+                <mesh filename="package://r2_ros/meshes/center_foot.stl" />
+            </geometry>
+            <material name="white" />
+        </visual>
+        <collision>
+            <origin xyz="0 0 -${center_ankle_joint_z}" rpy="${radians(90)} 0 ${radians(90)}" />
+            <geometry>
+                <mesh filename="package://r2_ros/meshes/center_foot.stl" />
+            </geometry>
+        </collision>
+        <xacro:inertial_box mass="${center_foot_mass}" x="${center_foot_width}" y="${center_foot_depth}" z="${center_foot_height}">
+            <origin xyz="0 0 ${0.01725 - (center_foot_height/2)}" rpy="0 0 0"/>
+        </xacro:inertial_box>
+    </link>
+
+    <!-- CENTER FRONT IDLER -->
+    <joint name="center_front_idler_joint" type="continuous">
+        <parent link="center_foot"/>
+        <child link="center_front_idler"/>
+        <origin xyz="${front_wheel_offset} 0 -${center_ankle_joint_z - wheel_radius + foot_distance_from_ground}" rpy="${pi/2} 0 0" />
+        <axis xyz="0 0 -1"/>
+    </joint>
+
+    <link name="center_front_idler">
+        <visual>
+            <geometry>
+                <cylinder radius="${wheel_radius}" length="${wheel_thickness}"/>
+            </geometry>
+            <material name="blue"/>
+        </visual>
+        <collision>
+            <geometry>
+                <cylinder radius="${wheel_radius}" length="${wheel_thickness}"/>
+            </geometry>
+        </collision>
+        <xacro:inertial_cylinder mass="${wheel_mass}" length="${wheel_thickness}" radius="${wheel_radius}">
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+        </xacro:inertial_cylinder>
+    </link>
+
+    <gazebo reference="center_front_idler">
+        <material>Gazebo/Blue</material>
+        <mu1>0</mu1>
+        <mu2>0</mu2>
+    </gazebo>
+
+    <!-- DOME -->
+    <joint name="dome_joint" type="continuous">
+        <parent link="body" />
+        <child link="dome" />
+        <origin xyz="0 0 ${dome_offset}" rpy="${radians(90)} 0 ${radians(180)}" />
+        <axis xyz="0 -1 0" />
+    </joint>
+
+    <link name="dome">
+        <visual>
+            <geometry>
+                <mesh filename="package://r2_ros/meshes/dome.obj" />
+            </geometry>
+        </visual>
+        <collision>
+            <geometry>
+                <mesh filename="package://r2_ros/meshes/dome.obj" />
+            </geometry>
+        </collision>
+        <xacro:inertial_sphere mass="1" radius="${dome_radius}">
             <origin xyz="0 0 0" rpy="0 0 0"/>
         </xacro:inertial_sphere>
     </link>
-
-    <gazebo reference="caster_wheel">
-        <material>Gazebo/White</material>
-        <mu1 value="0.001"/>
-        <mu2 value="0.001"/>
-    </gazebo>
 
 </robot>
