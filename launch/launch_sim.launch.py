@@ -4,12 +4,12 @@ from ament_index_python.packages import get_package_share_directory
 
 
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
+from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument, ExecuteProcess, TimerAction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 
 from launch_ros.actions import Node
-
+from math import radians
 
 
 def generate_launch_description():
@@ -69,6 +69,12 @@ def generate_launch_description():
                                    '-z', '0.1'],
                         output='screen')
 
+    ankle_pos_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["ankle_pos"],
+        output='screen'
+    )
 
     diff_drive_spawner = Node(
         package="controller_manager",
@@ -80,6 +86,18 @@ def generate_launch_description():
         package="controller_manager",
         executable="spawner",
         arguments=["joint_broad"],
+    )
+
+    angle = 18
+    rads = radians(angle)
+
+    set_angles = ExecuteProcess(
+        cmd=[
+            "ros2", "topic", "pub", "--once",
+            "/ankle_pos/commands", "std_msgs/msg/Float64MultiArray",
+            f"{{data: [-{rads}, -{rads}, {rads * 2}, -{rads}, 0]}}"  # 30 deg in radians; add more values if you listed more joints
+        ],
+        output="screen",
     )
 
 
@@ -129,7 +147,9 @@ def generate_launch_description():
         gazebo,
         spawn_entity,
         diff_drive_spawner,
+        ankle_pos_spawner,
         joint_broad_spawner,
         ros_gz_bridge,
-        ros_gz_image_bridge
+        ros_gz_image_bridge,
+        TimerAction(period=15.0, actions=[set_angles])
     ])

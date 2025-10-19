@@ -17,6 +17,7 @@
 
   <xacro:property name="outer_ankle_joint_z" value="0.13653" />
   <xacro:property name="center_ankle_joint_z" value="0.12383" />
+  <xacro:property name="center_wheel_radius" value="0.0508" /> <!-- 4" diameter -->
   <xacro:property name="wheel_radius" value="0.059685" /><!-- 5cm radius -->
   <xacro:property name="wheel_thickness" value="0.05" /> <!-- 5cm -->
   <xacro:property name="wheel_separation" value="${(body_radius + 0.0127 + 0.0425) * 2}" />
