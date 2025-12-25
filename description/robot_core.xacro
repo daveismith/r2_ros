@@ -276,15 +276,15 @@
         shoulder to ankle is 21.638 in" (549.6052 mm)
         ${0.5496052 - 0.245745 + 0.098425}
     -->
-    <!--
-    <joint name="left_shoulder_joint" type="revolute">
-        <origin xyz="0 ${body_radius - 0.0127} ${0.5496052}" rpy="0 0 0" />
-        <parent link="left_leg" />
-        <child link="shoulder" />
-        <axis xyz="0 -1 0" />
-        <limit lower="-${radians(4)}" upper="${radians(36)}" velocity="100" effort="100" />
-    </joint>
-    -->
+    <xacro:unless value="$(arg sim_mode)">
+        <joint name="left_shoulder_joint" type="revolute">
+            <origin xyz="0 ${body_radius - 0.0127} ${0.5496052}" rpy="0 0 0" />
+            <parent link="left_leg" />
+            <child link="shoulder" />
+            <axis xyz="0 -1 0" />
+            <limit lower="-${radians(4)}" upper="${radians(36)}" velocity="100" effort="100" />
+        </joint>
+    </xacro:unless>
 
     <joint name="right_shoulder_joint" type="revolute">
         <origin xyz="0 ${body_radius + 0.0127} ${0.5496052}" rpy="0 0 0" />

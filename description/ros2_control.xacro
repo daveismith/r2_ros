@@ -2,6 +2,9 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
     <xacro:unless value="$(arg sim_mode)">
+        <ros2_control name="RealRobot" type="generic_system">
+        </ros2_control>
+    <!--
         <ros2_control name="RealRobot" type="system">
             <hardware>
                 <plugin>diffdrive_arduino/DiffDriveArduinoHardware</plugin>
@@ -30,6 +33,7 @@
                 <state_interface name="velocity"/>
             </joint>
         </ros2_control>
+        -->
     </xacro:unless>
 
     <xacro:if value="$(arg sim_mode)">

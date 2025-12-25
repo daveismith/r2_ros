@@ -4,13 +4,13 @@ from ament_index_python.packages import get_package_share_directory
 
 
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription, TimerAction
+from launch.actions import IncludeLaunchDescription, SetEnvironmentVariable, TimerAction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import Command
 from launch.actions import RegisterEventHandler
 from launch.event_handlers import OnProcessStart
-
 from launch_ros.actions import Node
+from math import radians
 
 
 
@@ -59,18 +59,18 @@ def generate_launch_description():
 
     delayed_controller_manager = TimerAction(period=3.0, actions=[controller_manager])
 
-    diff_drive_spawner = Node(
-        package="controller_manager",
-        executable="spawner",
-        arguments=["diff_cont"],
-    )
+    #diff_drive_spawner = Node(
+    #    package="controller_manager",
+    #    executable="spawner",
+    #    arguments=["diff_cont"],
+    #)
 
-    delayed_diff_drive_spawner = RegisterEventHandler(
-        event_handler=OnProcessStart(
-            target_action=controller_manager,
-            on_start=[diff_drive_spawner],
-        )
-    )
+    #delayed_diff_drive_spawner = RegisterEventHandler(
+    #    event_handler=OnProcessStart(
+    #        target_action=controller_manager,
+    #        on_start=[diff_drive_spawner],
+    #    )
+    #)
 
     joint_broad_spawner = Node(
         package="controller_manager",
@@ -85,6 +85,21 @@ def generate_launch_description():
         )
     )
 
+    joint_state_publisher = Node(
+        package="joint_state_publisher",
+        executable="joint_state_publisher",
+        output='screen',
+        parameters=[
+            {
+                'source_list': ['/left_shoulder/position', '/right_shoulder/position'],
+                'zeros': {
+                    'right_shoulder_joint': radians(0),
+                    'right_ankle_joint': radians(0),
+                    'left_shoulder_joint': radians(0),
+                    'left_ankle_joint': radians(0),
+                }
+            }]
+    )
 
     # Code for delaying a node (I haven't tested how effective it is)
     # 
@@ -109,7 +124,8 @@ def generate_launch_description():
         rsp,
         # joystick,
         twist_mux,
-        delayed_controller_manager,
-        delayed_diff_drive_spawner,
-        delayed_joint_broad_spawner
+        #delayed_controller_manager,
+        #delayed_diff_drive_spawner,
+        #delayed_joint_broad_spawner,
+        joint_state_publisher
     ])
